@@ -1,0 +1,36 @@
+--- hiredis-0.10.0/Makefile	2011-12-20 16:34:25.025574337 +0200
++++ hiredis-0.10.0/Makefile	2011-12-20 16:38:47.294352952 +0200
+@@ -37,7 +37,9 @@
+   DYLIBSUFFIX=so
+   STLIBSUFFIX=a
+   DYLIBNAME?=$(LIBNAME).$(DYLIBSUFFIX)
+-  DYLIB_MAKE_CMD?=gcc -shared -Wl,-soname,$(DYLIBNAME) -o $(DYLIBNAME)
++  DYLIBSONAME?=$(DYLIBNAME).0
++  LINKLIBNAME?=$(subst lib,,$(LIBNAME))
++  DYLIB_MAKE_CMD?=$(CC) -shared -Wl,-soname,$(DYLIBSONAME) -o $(DYLIBNAME)
+   STLIBNAME?=$(LIBNAME).$(STLIBSUFFIX)
+   STLIB_MAKE_CMD?=ar rcs $(STLIBNAME)
+ endif
+@@ -88,8 +90,8 @@
+ 	$(CC) -o $@ $(CCOPT) $(DEBUG) -I$(AE_DIR) $(LDFLAGS) $(STLIBNAME) example-ae.c $(AE_DIR)/ae.o $(AE_DIR)/zmalloc.o
+ endif
+ 
+-hiredis-%: %.o $(STLIBNAME)
+-	$(CC) -o $@ $(CCOPT) $(DEBUG) $(LDFLAGS) $(STLIBNAME) $<
++hiredis-%: %.o $(DYLIBNAME)
++	$(CC) -o $@ $(CCOPT) $(DEBUG) -l$(LINKLIBNAME) $(LDFLAGS) $<
+ 
+ test: hiredis-test
+ 	./hiredis-test
+@@ -106,7 +108,10 @@
+ install: $(DYLIBNAME) $(STLIBNAME)
+ 	mkdir -p $(INSTALL_INCLUDE_PATH) $(INSTALL_LIBRARY_PATH)
+ 	$(INSTALL) hiredis.h async.h adapters $(INSTALL_INCLUDE_PATH)
+-	$(INSTALL) $(DYLIBNAME) $(STLIBNAME) $(INSTALL_LIBRARY_PATH)
++	$(INSTALL) $(STLIBNAME) $(INSTALL_LIBRARY_PATH)
++	$(INSTALL) $(DYLIBNAME) $(INSTALL_LIBRARY_PATH)/$(DYLIBNAME).0.0.0
++	ln -s $(DYLIBNAME).0.0.0 $(INSTALL_LIBRARY_PATH)/$(DYLIBNAME).0
++	ln -s $(DYLIBNAME).0.0.0 $(INSTALL_LIBRARY_PATH)/$(DYLIBNAME)
+ 
+ 32bit:
+ 	@echo ""
