@@ -1,26 +1,47 @@
 Summary:	A minimalistic C client library for Redis
+Summary(pl.UTF-8):	Minimalistyczna biblioteka C klienta Redisa
 Name:		hiredis
-Version:	0.10.0
+Version:	0.11.0
 Release:	1
 License:	BSD
 Group:		Libraries
-URL:		https://github.com/antirez/hiredis
-Source0:	https://github.com/antirez/hiredis/tarball/v%{version}/%{name}-%{version}.tgz
-# Source0-md5:	66edb31cdc39c94978ddf98538259d72
+Source0:	https://github.com/redis/hiredis/tarball/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	a78e34702c6e34cc44126b178ed82225
 Patch0:		link.patch
+URL:		https://github.com/redis/hiredis/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 Hiredis is a minimalistic C client library for the Redis database.
 
+%description -l pl.UTF-8
+Hiredis to minimalistyczna biblioteka C klienta bazy danych Redis.
+
 %package devel
-Summary:	Header files and libraries for hiredis C development
+Summary:	Header files for hiredis C development
+Summary(pl.UTF-8):	Pliki nagłówkowe do programowania w C z użyciem hiredisa
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
-The %{name}-devel package contains the header files and libraries to
-develop applications using a Redis database.
+This package contains the header files to develop applications using a
+Redis database.
+
+%description devel -l pl.UTF-8
+Ten pakiet zawiera pliki nagłówkowe do tworzenia aplikacji
+wykorzystujących bazę danych Redis.
+
+%package static
+Summary:	Static hiredis library
+Summary(pl.UTF-8):	Statyczna biblioteka hiredis
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description static
+Static hiredis library.
+
+%description static -l pl.UTF-8
+Statyczna biblioteka hiredis.
 
 %prep
 %setup -qc
@@ -32,7 +53,7 @@ mv *-%{name}-*/* .
 	CC="%{__cc}" \
 	DEBUG="" \
 	LDFLAGS="-L. %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags}"
+	OPTIMIZATION="%{rpmcflags} %{rpmcppflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -44,8 +65,6 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 install -p hiredis-example hiredis-test $RPM_BUILD_ROOT%{_bindir}
 
-find $RPM_BUILD_ROOT -name *.a | xargs rm -v
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -54,14 +73,17 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING TODO
+%doc CHANGELOG.md COPYING README.md
 %attr(755,root,root) %{_bindir}/hiredis-example
 %attr(755,root,root) %{_bindir}/hiredis-test
-%attr(755,root,root) %{_libdir}/libhiredis.so.*.*.*
-%ghost %{_libdir}/libhiredis.so.0
+%attr(755,root,root) %{_libdir}/libhiredis.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/libhiredis.so.0
 
 %files devel
 %defattr(644,root,root,755)
-%doc README.md
+%attr(755,root,root) %{_libdir}/libhiredis.so
 %{_includedir}/%{name}
-%{_libdir}/libhiredis.so
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/libhiredis.a
