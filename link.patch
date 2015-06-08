@@ -1,6 +1,6 @@
---- hiredis-0.11.0/Makefile.orig	2013-12-12 17:28:25.817204756 +0100
-+++ hiredis-0.11.0/Makefile	2013-12-12 17:33:18.150525821 +0100
-@@ -23,7 +23,7 @@
+--- hiredis-0.13.1/Makefile.orig	2015-05-03 22:58:11.000000000 +0200
++++ hiredis-0.13.1/Makefile	2015-06-08 18:05:58.081044826 +0200
+@@ -47,7 +47,7 @@
  DYLIB_MINOR_NAME=$(LIBNAME).$(DYLIBSUFFIX).$(HIREDIS_MAJOR).$(HIREDIS_MINOR)
  DYLIB_MAJOR_NAME=$(LIBNAME).$(DYLIBSUFFIX).$(HIREDIS_MAJOR)
  DYLIBNAME=$(LIBNAME).$(DYLIBSUFFIX)
@@ -9,23 +9,23 @@
  STLIBNAME=$(LIBNAME).$(STLIBSUFFIX)
  STLIB_MAKE_CMD=ar rcs $(STLIBNAME)
  
-@@ -76,8 +76,8 @@
- 	$(CC) -o $@ $(REAL_CFLAGS) $(REAL_LDFLAGS) -I$(AE_DIR) $(AE_DIR)/ae.o $(AE_DIR)/zmalloc.o example-ae.c $(STLIBNAME)
- endif
+@@ -120,8 +120,8 @@
+ 
+ hiredis-test: test.o $(STLIBNAME)
  
 -hiredis-%: %.o $(STLIBNAME)
--	$(CC) -o $@ $(REAL_LDFLAGS) $< $(STLIBNAME)
+-	$(CC) $(REAL_CFLAGS) -o $@ $(REAL_LDFLAGS) $< $(STLIBNAME)
 +hiredis-%: %.o $(DYLIBNAME)
-+	$(CC) -o $@ $(REAL_LDFLAGS) $< -l$(subst lib,,$(LIBNAME))
++	$(CC) $(REAL_CFLAGS) -o $@ $(REAL_LDFLAGS) $< -L. -l$(subst lib,,$(LIBNAME))
  
  test: hiredis-test
  	./hiredis-test
-@@ -121,7 +121,7 @@
- 	$(INSTALL) hiredis.h async.h adapters $(INSTALL_INCLUDE_PATH)
+@@ -165,7 +165,7 @@
+ 	$(INSTALL) hiredis.h async.h read.h sds.h adapters $(INSTALL_INCLUDE_PATH)
  	$(INSTALL) $(DYLIBNAME) $(INSTALL_LIBRARY_PATH)/$(DYLIB_MINOR_NAME)
  	cd $(INSTALL_LIBRARY_PATH) && ln -sf $(DYLIB_MINOR_NAME) $(DYLIB_MAJOR_NAME)
 -	cd $(INSTALL_LIBRARY_PATH) && ln -sf $(DYLIB_MAJOR_NAME) $(DYLIBNAME)
 +	cd $(INSTALL_LIBRARY_PATH) && ln -sf $(DYLIB_MINOR_NAME) $(DYLIBNAME)
  	$(INSTALL) $(STLIBNAME) $(INSTALL_LIBRARY_PATH)
- 
- 32bit:
+ 	mkdir -p $(INSTALL_PKGCONF_PATH)
+ 	$(INSTALL) $(PKGCONFNAME) $(INSTALL_PKGCONF_PATH)

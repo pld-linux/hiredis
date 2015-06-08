@@ -1,12 +1,12 @@
 Summary:	A minimalistic C client library for Redis
 Summary(pl.UTF-8):	Minimalistyczna biblioteka C klienta Redisa
 Name:		hiredis
-Version:	0.11.0
-Release:	2
+Version:	0.13.1
+Release:	1
 License:	BSD
 Group:		Libraries
-Source0:	https://github.com/redis/hiredis/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	a78e34702c6e34cc44126b178ed82225
+Source0:	https://github.com/redis/hiredis/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	4226dda52dbe08304e3b6027b4d6c74d
 Patch0:		link.patch
 URL:		https://github.com/redis/hiredis/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -44,26 +44,28 @@ Static hiredis library.
 Statyczna biblioteka hiredis.
 
 %prep
-%setup -qc
-mv *-%{name}-*/* .
+%setup -q
 %patch0 -p1
 
 %build
 %{__make} \
 	CC="%{__cc}" \
 	DEBUG="" \
-	LDFLAGS="-L. %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} %{rpmcppflags}"
+	LDFLAGS="%{rpmldflags}" \
+	OPTIMIZATION="%{rpmcflags} %{rpmcppflags}" \
+	PREFIX=%{_prefix} \
+	LIBRARY_PATH=%{_lib}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	INSTALL="cp -a" \
-	PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-	INSTALL_LIBRARY_PATH=$RPM_BUILD_ROOT%{_libdir}
+	DESTDIR=$RPM_BUILD_ROOT \
+	PREFIX=%{_prefix} \
+	LIBRARY_PATH=%{_lib}
 
 install -d $RPM_BUILD_ROOT%{_bindir}
-install -p hiredis-example hiredis-test $RPM_BUILD_ROOT%{_bindir}
+install -p hiredis-test $RPM_BUILD_ROOT%{_bindir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -74,7 +76,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG.md COPYING README.md
-%attr(755,root,root) %{_bindir}/hiredis-example
 %attr(755,root,root) %{_bindir}/hiredis-test
 %attr(755,root,root) %{_libdir}/libhiredis.so.*.*
 %attr(755,root,root) %ghost %{_libdir}/libhiredis.so.0
@@ -82,7 +83,8 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libhiredis.so
-%{_includedir}/%{name}
+%{_includedir}/hiredis
+%{_pkgconfigdir}/hiredis.pc
 
 %files static
 %defattr(644,root,root,755)
