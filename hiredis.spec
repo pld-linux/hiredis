@@ -87,6 +87,21 @@ Static hiredis SSL library.
 %description ssl-static -l pl.UTF-8
 Statyczna biblioteka hiredis SSL.
 
+%package tools
+Summary:	Test utility for hiredis
+Summary(pl.UTF-8):	Narzędzie testowe do biblioteki hiredis
+Group:		Applications/Networking
+Requires:	%{name} = %{version}-%{release}
+%if %{with ssl}
+Requires:	%{name}-ssl = %{version}-%{release}
+%endif
+
+%description tools
+Test utility for hiredis.
+
+%description tools -l pl.UTF-8
+Narzędzie testowe do biblioteki hiredis.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -122,7 +137,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG.md COPYING README.md
-%attr(755,root,root) %{_bindir}/hiredis-test
 %attr(755,root,root) %{_libdir}/libhiredis.so.1.0.0
 
 %files devel
@@ -156,3 +170,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/libhiredis_ssl.a
 %endif
+
+%files tools
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/hiredis-test
