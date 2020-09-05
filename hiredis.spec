@@ -1,15 +1,20 @@
+#
+# Conditional build:
+%bcond_without	ssl	# SSL library
+
 Summary:	A minimalistic C client library for Redis
 Summary(pl.UTF-8):	Minimalistyczna biblioteka C klienta Redisa
 Name:		hiredis
-Version:	0.14.1
+Version:	1.0.0
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/redis/hiredis/releases
 Source0:	https://github.com/redis/hiredis/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	3e1c541f9df28becb82a611e63e3e939
+# Source0-md5:	209ae570cdee65a5143ea6db8ac07fe3
 Patch0:		link.patch
 URL:		https://github.com/redis/hiredis/
+%{?with_ssl:BuildRequires:	openssl-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -44,6 +49,44 @@ Static hiredis library.
 %description static -l pl.UTF-8
 Statyczna biblioteka hiredis.
 
+%package ssl
+Summary:	SSL support library for hiredis
+Summary(pl.UTF-8):	Biblioteka opsługi SSL dla biblioteki hiredis
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description ssl
+SSL support library for hiredis.
+
+%description ssl -l pl.UTF-8
+Biblioteka opsługi SSL dla biblioteki hiredis.
+
+%package ssl-devel
+Summary:	Header file for hiredis SSL library
+Summary(pl.UTF-8):	Plik nagłówkowy biblioteki hiredis SSL
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{name}-ssl = %{version}-%{release}
+Requires:	openssl-devel
+
+%description ssl-devel
+Header file for hiredis SSL library.
+
+%description ssl-devel -l pl.UTF-8
+Plik nagłówkowy biblioteki hiredis SSL.
+
+%package ssl-static
+Summary:	Static hiredis SSL library
+Summary(pl.UTF-8):	Statyczna biblioteka hiredis SSL
+Group:		Development/Libraries
+Requires:	%{name}-ssl-devel = %{version}-%{release}
+
+%description ssl-static
+Static hiredis SSL library.
+
+%description ssl-static -l pl.UTF-8
+Statyczna biblioteka hiredis SSL.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -55,15 +98,17 @@ Statyczna biblioteka hiredis.
 	LDFLAGS="%{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} %{rpmcppflags}" \
 	PREFIX=%{_prefix} \
-	LIBRARY_PATH=%{_lib}
+	LIBRARY_PATH=%{_lib} \
+	%{?with_ssl:USE_SSL=1}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install \
-	INSTALL="cp -a" \
+	INSTALL="cp -p" \
 	DESTDIR=$RPM_BUILD_ROOT \
 	PREFIX=%{_prefix} \
-	LIBRARY_PATH=%{_lib}
+	LIBRARY_PATH=%{_lib} \
+	%{?with_ssl:USE_SSL=1}
 
 install -d $RPM_BUILD_ROOT%{_bindir}
 install -p hiredis-test $RPM_BUILD_ROOT%{_bindir}
@@ -78,15 +123,36 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc CHANGELOG.md COPYING README.md
 %attr(755,root,root) %{_bindir}/hiredis-test
-%attr(755,root,root) %{_libdir}/libhiredis.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/libhiredis.so.0
+%attr(755,root,root) %{_libdir}/libhiredis.so.1.0.0
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libhiredis.so
-%{_includedir}/hiredis
+%dir %{_includedir}/hiredis
+%{_includedir}/hiredis/adapters
+%{_includedir}/hiredis/alloc.h
+%{_includedir}/hiredis/async.h
+%{_includedir}/hiredis/hiredis.h
+%{_includedir}/hiredis/read.h
+%{_includedir}/hiredis/sds.h
 %{_pkgconfigdir}/hiredis.pc
 
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libhiredis.a
+
+%if %{with ssl}
+%files ssl
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libhiredis_ssl.so.1.0.0
+
+%files ssl-devel
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libhiredis_ssl.so
+%{_includedir}/hiredis/hiredis_ssl.h
+%{_pkgconfigdir}/hiredis_ssl.pc
+
+%files ssl-static
+%defattr(644,root,root,755)
+%{_libdir}/libhiredis_ssl.a
+%endif
