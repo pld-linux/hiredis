@@ -107,7 +107,7 @@ Narzędzie testowe do biblioteki hiredis.
 %patch0 -p1
 
 %build
-%{__make} \
+%{__make} -j1 \
 	CC="%{__cc}" \
 	DEBUG="" \
 	LDFLAGS="%{rpmldflags}" \
@@ -118,6 +118,7 @@ Narzędzie testowe do biblioteki hiredis.
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	INSTALL="cp -p" \
 	DESTDIR=$RPM_BUILD_ROOT \
