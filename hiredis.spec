@@ -5,13 +5,13 @@
 Summary:	A minimalistic C client library for Redis
 Summary(pl.UTF-8):	Minimalistyczna biblioteka C klienta Redisa
 Name:		hiredis
-Version:	1.0.0
-Release:	3
+Version:	1.0.2
+Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/redis/hiredis/releases
 Source0:	https://github.com/redis/hiredis/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	209ae570cdee65a5143ea6db8ac07fe3
+# Source0-md5:	58e8313188f66ed1be1c220d14a7752e
 Patch0:		link.patch
 URL:		https://github.com/redis/hiredis/
 %{?with_ssl:BuildRequires:	openssl-devel}
