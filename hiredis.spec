@@ -5,13 +5,13 @@
 Summary:	A minimalistic C client library for Redis
 Summary(pl.UTF-8):	Minimalistyczna biblioteka C klienta Redisa
 Name:		hiredis
-Version:	1.0.2
+Version:	1.1.0
 Release:	1
 License:	BSD
 Group:		Libraries
 #Source0Download: https://github.com/redis/hiredis/releases
 Source0:	https://github.com/redis/hiredis/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	58e8313188f66ed1be1c220d14a7752e
+# Source0-md5:	699faede056b6d5aea1c3f41f832e172
 Patch0:		link.patch
 URL:		https://github.com/redis/hiredis/
 %{?with_ssl:BuildRequires:	openssl-devel}
@@ -138,7 +138,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG.md COPYING README.md
-%attr(755,root,root) %{_libdir}/libhiredis.so.1.0.0
+%attr(755,root,root) %{_libdir}/libhiredis.so.1.1.0
 
 %files devel
 %defattr(644,root,root,755)
@@ -150,6 +150,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/hiredis/hiredis.h
 %{_includedir}/hiredis/read.h
 %{_includedir}/hiredis/sds.h
+%{_includedir}/hiredis/sockcompat.h
 %{_pkgconfigdir}/hiredis.pc
 
 %files static
@@ -159,7 +160,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with ssl}
 %files ssl
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libhiredis_ssl.so.1.0.0
+%attr(755,root,root) %{_libdir}/libhiredis_ssl.so.1.1.0
 
 %files ssl-devel
 %defattr(644,root,root,755)
